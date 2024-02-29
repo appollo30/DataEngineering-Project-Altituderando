@@ -1,6 +1,7 @@
 import pandas as pd
 import pymongo
 from elasticsearch import Elasticsearch
+from elasticsearch.helpers import bulk
 from os import environ
 from time import sleep
 
@@ -45,9 +46,22 @@ df = pd.read_json("./data/results.json")
 df['comments'] = df['comments'].apply(extract_content)
 df['date'] = df['date'].astype(object).where(df['date'].notnull(), None)
 
-data_dict = df.to_dict(orient="records")
-
 
 
 #Insertion dans la collection mongo
-collection.insert_many(data_dict)
+data_dict_mongo = df.to_dict(orient="records")
+collection.insert_many(data_dict_mongo)
+print("Insertion dans mongo réussie")
+
+#Insertion dans Elasticsearch
+data_dict_elasticsearch = df.fillna("").to_dict(orient="records")
+def generate_data(documents):
+    for docu in documents:
+        yield {
+            "_index": "altituderando",
+            "_type": "page",
+            "_source": {k:v if v else None for k,v in docu.items()},
+        }
+
+bulk(es_client, generate_data(data_dict_elasticsearch))
+print("Insertion dans Elasticsearch réussie")
