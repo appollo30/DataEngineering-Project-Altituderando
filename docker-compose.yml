@@ -23,7 +23,7 @@ services:
     environment:
       - ELASTICSEARCH_URL=http://elasticsearch:9200
 
-  altituderando:
+  altituderando-pip:
     image: altituderando:latest
     depends_on:
       - mongodb

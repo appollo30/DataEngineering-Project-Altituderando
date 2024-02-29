@@ -1,22 +1,12 @@
-FROM continuumio/miniconda3
+FROM python:3.8
 
 WORKDIR /app
 
-COPY ./environment.yml .
+COPY ./requirements.txt .
 
-RUN conda env create -f environment.yml
-
-SHELL ["conda", "run", "-n", "project-altituderando", "/bin/bash", "-c"]
-#SHELL ["/bin/bash", "-c"]
-
+RUN pip install -r requirements.txt
 
 COPY src/. ./src
 COPY data/. ./data
 
-#ENTRYPOINT ["sleep", "1000"]
-#CMD ls -la
-#ENTRYPOINT ["conda", "run", "--no-capture-output", "-n", "myenv", "python", "./src/insertion.py"]
-#CMD conda run ./src/insertion.py
-#CMD ["bash"]
-ENTRYPOINT ["conda", "run", "--no-capture-output", "-n", "project-altituderando"]
-CMD ["python" , "./src/insertion.py"]
+CMD ["python", "./src/insertion.py"]
