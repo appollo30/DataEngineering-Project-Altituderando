@@ -1,11 +1,17 @@
 import pandas as pd
 import pymongo
+import os
+
 
 print("fesses")
 
 
 ##Instanciation du client Mongo
-client = pymongo.MongoClient("mongodb",27017)
+var = os.environ
+mongo_host = var.get("MONGO_HOST")
+mongo_port = var.get("MONGO_PORT")
+
+client = pymongo.MongoClient("localhost" if mongo_host == None else mongo_host,27017 if mongo_port == None else int(mongo_port))
 database = client['altituderando']
 collection = database['pages']
 collection.delete_many({})
