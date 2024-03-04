@@ -26,6 +26,7 @@ def insert_mongo(data):
     collection = database['pages']
     #Insertion
     data_dict_mongo = df.to_dict(orient="records")
+    collection.delete_many({})
     collection.insert_many(data_dict_mongo)
     return True
 
@@ -66,14 +67,17 @@ def insert_es(data):
 
 
 #Traitement de la donnee depuis results.csv
-def extract_content(comments):
-    return [comment['content'] for comment in comments]
+def extract(comments,field):
+    return [comment[field] for comment in comments]
 
 
 df = pd.read_json("./data/results.json")
-df['comments'] = df['comments'].apply(extract_content)
+df['comments_author'] = df['comments'].apply(extract,field='author')
+df['comments_content'] = df['comments'].apply(extract,field='content')
+df['comments_date'] = df['comments'].apply(extract,field='date')
 df['date'] = df['date'].astype(object).where(df['date'].notnull(), None)
+df = df.drop('comments',axis=1)
 
 
 print("Insertion dans Mongo: ", insert_mongo(df))
-print("Insertion dans Elasticsearch: ", insert_es(df))
+#print("Insertion dans Elasticsearch: ", insert_es(df))

@@ -12,6 +12,7 @@ class AltitudeRandoSpider(scrapy.spiders.SitemapSpider):
     custom_settings = {
         'USER_AGENT': 'MyCustomUserAgent'+ str(random.randint(0,1e6)) +'/1.0'
     }
+    #On utilise un dictionnaire des mois de l'année car on veut pouvoir convertir les dates d'un format naturel ("11 Janvier 2024") à un format datetime.date
     mois = {
         "janvier": 1,
         "février": 2,
@@ -47,7 +48,6 @@ class AltitudeRandoSpider(scrapy.spiders.SitemapSpider):
             'itinerary' : "".join(response.css('div[id="itineraire"]').css('div[class="ctexte"]').css('p::text').extract()),
             'additional_info' : self.traiter_infos_supplementaires(response),
             'comments' : self.traiter_commentaires(response),
-            #'comments' : response.css('div[id="commentaires"]').css('ul').css('div[class="contenu-msg"]').css('p::text').extract(),
             'date' : self.nettoyer_et_convertir_date(self.trouver_date_modification(response.css('div[class="metadates"]').css('p::text').extract()))
         }
         pass
@@ -69,6 +69,28 @@ class AltitudeRandoSpider(scrapy.spiders.SitemapSpider):
             # Gérer le cas où le format de date est différent
             date_obj = None
         return date_obj
+    
+    def nettoyer_et_convertir_date_commentaires(self,str_date):
+        if str_date == "" or str_date == None:
+            return None
+        str_split = str_date.split(" ")[1:-2]
+        try:
+            if len(str_split) == 2:
+                jour = int(str_split[0])
+                mois = int(self.mois[str_split[1]])
+                date_obj = date(2024,mois,jour)
+            if len(str_split) == 3:
+                jour = int(str_split[0])
+                mois = int(self.mois[str_split[1]])
+                annee = int(str_split[2])
+                date_obj = date(annee,mois,jour)
+            else:
+                date_obj = None
+        except (ValueError,KeyError) as error:
+            date_obj = None
+        return date_obj        
+
+        
 
     def convertir_int(self,str_result):
         try:
@@ -90,7 +112,7 @@ class AltitudeRandoSpider(scrapy.spiders.SitemapSpider):
         for li in ulli:
             auteur = li.css('div[class="entete-msg"]').css('a::text').extract_first()
             contenu = "".join(li.css('div[class="contenu-msg"]').css('p::text').extract())
-            date = li.css('span[class="date"]::text').extract_first()
+            date = self.nettoyer_et_convertir_date_commentaires(li.css('span[class="date"]::text').extract_first())
             res.append({
                 'author' : auteur,
                 'content' : contenu,
