@@ -107,6 +107,7 @@ class AltitudeRandoSpider(scrapy.spiders.SitemapSpider):
         return r2
 
     def traiter_commentaires(self,response):
+        #Pour diviser les commentaires en 3 champs, L'auteur, le contenu, et la date de post du commentaire
         ulli = response.css('div[id="commentaires"]').css('ul li')
         res = []
         for li in ulli:

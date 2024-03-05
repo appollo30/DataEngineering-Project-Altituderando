@@ -7,17 +7,12 @@ from time import sleep
 
 print("fesses")
 
-#Variables d'environnement
-
-
-
-
-
 def insert_mongo(data):
     #Variables d'environnement
     mongo_host = environ.get("MONGO_HOST")
     mongo_port = environ.get("MONGO_PORT")
     #Instanciation du client Mongo
+    global mongo_client
     mongo_client = pymongo.MongoClient("localhost" if mongo_host == None else mongo_host,27017 if mongo_port == None else int(mongo_port))
     print(mongo_host)
     print(mongo_port)
@@ -33,18 +28,18 @@ def insert_mongo(data):
 
 def insert_es(data):
     #Variables d'environnement
-    el_host = environ.get("ELASTICSEARCH_HOST")
-    el_port = environ.get("ELASTICSEARCH_PORT")
+    es_host = environ.get("ELASTICSEARCH_HOST")
+    es_port = environ.get("ELASTICSEARCH_PORT")
     es_live = False
     #On essaie pendant une minute de se connecter à Elasticsearch
     retry_delay = 1
-    number_of_retries = 60
-
+    number_of_retries = 120
+    global es_client
     while not es_live and number_of_retries > 0:
         #Instanciation du client Elasticsearch
         #Avec docker-compose, les services sont lances simultanement donc il arrive que la base elasticsearch soit en ligne après l'exécution de insertion.py, donc elle n'a pas le temps de se lancer qu'on essaie déjà de s'y connecter
         #On y remédie en faisant une boucle où on essaie de se connecter a repetition jusqu'a se connecter. On met le delai entre les connexions à une seconde.
-        es_client = Elasticsearch(hosts=["localhost" if el_host == None else el_host])
+        es_client = Elasticsearch(hosts=["localhost" if es_host == None else es_host],timeout = 120)
         es_live = es_client.ping()
         sleep(retry_delay)
         number_of_retries += -1
@@ -65,7 +60,6 @@ def insert_es(data):
 
 
 
-
 #Traitement de la donnee depuis results.csv
 def extract(comments,field):
     return [comment[field] for comment in comments]
@@ -80,4 +74,4 @@ df = df.drop('comments',axis=1)
 
 
 print("Insertion dans Mongo: ", insert_mongo(df))
-#print("Insertion dans Elasticsearch: ", insert_es(df))
+print("Insertion dans Elasticsearch: ", insert_es(df))

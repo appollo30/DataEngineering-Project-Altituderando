@@ -19,4 +19,4 @@ COPY data/. ./data
 ##Avec scraping
 #CMD ["/bin/bash", "-c", "cd ./src && scrapy crawl altituderando -O results.json && cd .. && python ./src/insertion.py"]
 ##Pas de scraping
-CMD ["python", "./src/insertion.py"]
+CMD ["/bin/bash", "-c","python ./src/insertion.py && streamlit run ./src/app.py"]

@@ -33,6 +33,10 @@ services:
       MONGO_PORT: 27017
       ELASTICSEARCH_HOST: elasticsearch
       ELASTICSEARCH_PORT: 9200
+      STREAMLIT_HOST: streamlit
+      STREAMLIT_PORT: 8501
+    ports:
+      - "8501:8501"
 
 volumes:
   mongodb_data: 
