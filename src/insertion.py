@@ -4,7 +4,6 @@ from elasticsearch import Elasticsearch
 from elasticsearch.helpers import bulk
 from os import environ
 from time import sleep
-import uuid
 
 print("fesses")
 

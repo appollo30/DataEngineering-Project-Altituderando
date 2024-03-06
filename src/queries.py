@@ -1,8 +1,20 @@
+from itertools import chain
+
 def generate_query(str_prompt):
+    prompt_split = str_prompt.lower().split(" ")
     QUERY = {
         "query": {
-            "term": {
-                "page_title": str_prompt
+            "bool": {
+                "should": 
+                list(chain.from_iterable(
+                [
+                     [{ "term": { "page_title": term }},
+                     { "term": { "location": term }},
+                     { "term": { "acces": term }},
+                     { "term": { "description": term }},
+                     { "term": { "itinerary": term }}]
+                    for term in prompt_split
+                ]))
             }
         }
     }
