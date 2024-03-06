@@ -4,6 +4,7 @@ from elasticsearch import Elasticsearch
 from elasticsearch.helpers import bulk
 from os import environ
 from time import sleep
+import uuid
 
 print("fesses")
 
@@ -20,7 +21,7 @@ def insert_mongo(data):
     database = mongo_client['altituderando']
     collection = database['pages']
     #Insertion
-    data_dict_mongo = df.to_dict(orient="records")
+    data_dict_mongo = data.to_dict(orient="records")
     collection.delete_many({})
     collection.insert_many(data_dict_mongo)
     return True
@@ -45,15 +46,21 @@ def insert_es(data):
         number_of_retries += -1
     if not es_live:
         return False
+    print(es_host)
+    print(es_port)
+    print(es_client)
     #Traitement de la donnée
-    data_dict_es = df.fillna("").to_dict(orient="records")
+    data_dict_es = data.fillna("").to_dict(orient="records")
     def generate_data(documents):
-        for docu in documents:
+        for idx, docu in enumerate(documents):
             yield {
                 "_index": "altituderando",
                 "_type": "page",
-                "_source": {k:v if v else None for k,v in docu.items()},
+                "_id": idx + 1,  # Assuming index + 1 as the unique ID, adjust accordingly
+                "_source": {k: v if v else None for k, v in docu.items()},
             }
+    #On supprime tout contenu de l'index avant de le remplir
+    es_client.indices.delete(index='altituderando', ignore=[400, 404])
     #Insertion dans Elasticsearch
     bulk(es_client, generate_data(data_dict_es))
     return True
