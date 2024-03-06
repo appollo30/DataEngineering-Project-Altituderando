@@ -1,6 +1,6 @@
 from itertools import chain
 
-def generate_query(str_prompt):
+def generate_query(str_prompt,size):
     prompt_split = str_prompt.lower().split(" ")
     QUERY = {
         "query": {
@@ -16,9 +16,7 @@ def generate_query(str_prompt):
                     for term in prompt_split
                 ]))
             }
-        }
+        },
+        "size" : size
     }
     return QUERY
-
-
-
