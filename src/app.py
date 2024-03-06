@@ -30,7 +30,7 @@ if user_input:
     #st.markdown(str(result))
     st.markdown("Votre recherche a pris **" + str(result["took"]) + "** millisecondes et a trouvé **" + str(result["hits"]["total"]) + "** randonnées correspondantes!")
     content = [elt['_source'] for elt in result["hits"]["hits"]]
-    number_of_cols = 2
+    number_of_cols = 1
     for i in range(len(content)):
         row_index = i%number_of_cols
         if row_index==0:
@@ -48,7 +48,7 @@ if user_input:
             st.markdown("**🥵: "+content[i]['difficulty']+"**")
             st.image(str(content[i]['image_url']))
             st.markdown("* " + restrict_str(str(content[i]['description']),150))
-            if st.button("Plus d'infos",type='secondary',key=i):
+            with st.expander("Plus d'infos : "):
                 if content[i]['keywords'] != None:
                     st.markdown("* Mots-clés : " + str(content[i]['keywords']))
                 if content[i]['access'] != None:
