@@ -1,6 +1,6 @@
 from itertools import chain
 
-def generate_query(str_prompt,size,sorting_type,keywords):
+def generate_query(str_prompt,size,sorting_type,keywords,difficulty):
     prompt_split = str_prompt.lower().split(" ")
     QUERY = {
         "query": {
@@ -16,7 +16,7 @@ def generate_query(str_prompt,size,sorting_type,keywords):
                     for term in prompt_split
                 ],
                 [
-                    { "term": { "location": kw.lower() }}
+                    { "match": { "location": kw.lower() }}
                     for kw in keywords
                 ]]
                 ))
@@ -24,6 +24,9 @@ def generate_query(str_prompt,size,sorting_type,keywords):
         },
         "size" : size
     }
+    if difficulty != "":
+        QUERY["query"]["bool"]["should"].append({ "match": { "difficulty": difficulty.lower() }})
+
     if sorting_type == "Dénivelé (Croissant)":
         QUERY['sort'] = [
             { "height_difference": "asc" }
