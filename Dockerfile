@@ -17,6 +17,6 @@ COPY data/. ./data
 #décommentez la ligne 22 et commentez la ligne 20
 
 ##Avec scraping
-#CMD ["/bin/bash", "-c", "cd ./src && scrapy crawl altituderando -O results.json && cd .. && python ./src/insertion.py"]
+#CMD ["/bin/bash", "-c", "cd ./src && scrapy crawl altituderando -O results.json && cd .. && python ./src/insertion.py && streamlit run ./src/app.py"]
 ##Pas de scraping
 CMD ["/bin/bash", "-c","python ./src/insertion.py && streamlit run ./src/app.py"]
