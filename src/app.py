@@ -78,7 +78,7 @@ for i in range(len(content)):
                 st.markdown("* Itinéraire : "+ restrict_str(content[i]['itinerary'],500/number_of_cols))
             #Photos de la rando
             if content[i]['all_photos_url'] != None:
-                 st.link_button("Photos de la randonnée",url=content[i]['image_url'])
+                 st.link_button("Photos de la randonnée",url=content[i]['all_photos_url'])
             #Section commentaires
             if content[i]['comments_author'] == None:
                  st.subheader("Commentaires : Aucun")
