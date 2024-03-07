@@ -37,7 +37,6 @@ with colonne1:
 
 with colonne2:
      keywords = st.multiselect("Localisation", options=unique_locations)
-     st.markdown(keywords)
      tri = st.radio("Trier par :", ["Pertinence","Dénivelé (Croissant)", "Dénivelé (Décroissant)"])
      
 
