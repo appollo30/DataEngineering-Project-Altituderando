@@ -49,6 +49,9 @@ une fois que c'est fait, attendez jusqu'à voir ceci sur le terminal :
 Cela signifie que l'app est en ligne, vous pouvez vous y rendre en tapant ```localhost:8501``` sur votre navigateur.
 Vous devriez vous retrouver face à cette page : 
 
+<img width="732" alt="Capture d’écran 2024-03-07 à 17 27 12" src="https://github.com/appollo30/DataEngineering-Project-Altituderando/assets/27921296/dac6346f-81a4-4a7c-b1b1-dcf3e8079395">
+
+
 Vous pouvez donc tester l'app!
 
 # Fonctionnement :
@@ -70,6 +73,24 @@ Puis on a lancé la spider et stocké les informations dans un fichier json  ave
 
 On a également créé le fichier ```./src/jsonToCsv.py```pour pouvoir convertir les résultats du scraping du json au csv sans avoir besoin de relancer un scraping.
 
+Les inforamtions collectées dans le json sont:
+- Le titre de la page
+- Son url
+- Une courte description
+- L'image principale de l'article
+- La difficulté
+- L'auteur
+- Les noms de massifs, département, commune
+- La discipline (Randonnée, Alpinisme, Spéléo, etc.)
+- Des mots-clés
+- L'url où sont stockées toutes les photos de la rando postées par la communauté
+- Le dénivelé
+- L'accès à la rando
+- L'itinéraire
+- Des infos supplémentaires sur les endroits difficiles, l'équipement, etc.
+- La date de publication
+- Les commentaires avec leurs dates de publication et leurs auteurs
+
 ## L'Insertion
 
 On insère ensuite les données scrapées dans une base Mongo et un index Elasticsearch, pour cela on utilise Docker-compose, et on utilise les servieces mongo, elasticsearch, kibana, et celui qui est défini dans notre Dockerfile. On effectue notamment un mapping des ports pour que les services soient bien connectés entre eux et on utilise des variables d'environnement pour les ports et les hôtes de Elasticsearch et mongo.
@@ -82,4 +103,21 @@ Tout d'abord un prtit mot sur pourquoi est-ce qu'on a choisi d'utiliser les 2 sy
 Maintenant pour l'insertion, tout se passe dans ```./src/insertion.py```. On a choisi de le séparer en 2 fonctions distinctes, une pour mongo, une pour Elasticsearch. Pour mongo c'est relativement simple puisque le service se lance quasi instantanément dans docker-compose, tandis que Elasticsearch met plus de temps. On doit donc effectuer des tentatives de connexion à répétition au client Elasticsearch pour y avoir accès. Pour éviter le timeout, on l'a modifié à 120 secondes dans le client.
 
 ## L'App
-On a décidé d'utiliser la librairie streamlit pour l'app. C'est une librairie python utilisée pour créer des app web légères. 
+On a décidé d'utiliser la librairie streamlit pour l'app. C'est une librairie python utilisée pour créer des app web légères et des dashboards. Les app streamlit se rechargent à chaque fois que l'input de l'utilisateur est changée donc c'est idéal dans notre cas. 
+
+Quand l'user-input est changée, on génère une nouvelle requête Elasticsearch via la fonction ```generate_query```dans ```./src/queries.py```, puis on la recherche dans l'index, et on affiche les résultats et le temps que la recherche a pris.
+
+Lorsqu'on ouvre l'app on a accès à la page suivante:
+
+<img width="732" alt="Capture d’écran 2024-03-07 à 17 27 12" src="https://github.com/appollo30/DataEngineering-Project-Altituderando/assets/27921296/e343c092-2371-479e-b8cb-443f42ae28aa">
+
+On nous indique si la connexion à Elasticsearch est bonne, puis on a la barre de recherche principale, où on peut taper des mots-clés pour avoir une recherche termwise de chaque mot-clé dans le titre de la page, dans le lieu, dans la description, dans l'accès et dans l'itinéraire. Ensuite on peut choisir des localisations précises, la difficulté, et l'ordre du tri des résultats. 
+
+Enfin on peut regler l'affichage de la recherche avec le nombre de colonnes que l'on souhaite afficher et le nombre de résultats.
+
+
+# Notes
+
+Vous pouvez constater que le projet contient à la fois un ```requirements.txt```et un ```environment.yml```, c'est parce qu'à l'origine on utilisait une image miniconda, mais le fait d'avoir à la fois un conteneur docker et un environnement conda semblait redondant. De plus, l'image miniconda est beaucoup plus lourde que l'image officielle python. C'est pourquoi nous nous sommes rabattus sur l'image python. On a laissé le ```environment.yml``` au cas où, et parce que nous avions déjà un environnement déjà prêt sur nos machines en local lors du développement.
+
+Vous constaterez qu'on utilise également un service Kibana, on s'en est surtout servis au cours du développement pour voir si l'insertion se déroulait bien et pour analyser nos données. Si vous souhaitez consulter les données vous pouvez également vous rendre sur ```localhost:5601``` pour consulter l'index ```altituderando*``` après avoir lancé le docker-compose.
