@@ -65,7 +65,7 @@ for i in range(len(content)):
         st.markdown("**📍: "+" - ".join(content[i]['location'])+"**")
         st.markdown("**🥵: "+content[i]['difficulty']+"**")
         if content[i]['height_difference'] != None:
-             st.markdown("**Dénivelé ⛰️: " + str(int(content[i]['height_difference'])) + "**")
+             st.markdown("**Dénivelé ⛰️: " + str(int(content[i]['height_difference'])) + "m**")
         st.image(str(content[i]['image_url']))
         st.markdown("* " + restrict_str(str(content[i]['description']),200/number_of_cols))
         #Infos supplémentaires
