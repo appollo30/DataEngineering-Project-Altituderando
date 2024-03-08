@@ -7,19 +7,20 @@ def generate_query(str_prompt,size,sorting_type,keywords,difficulty):
             "bool": {
                 "should": 
                 list(chain.from_iterable(
-                [[
+                [
                      [{ "term": { "page_title": term }},
                      { "term": { "location": term }},
                      { "term": { "acces": term }},
                      { "term": { "description": term }},
                      { "term": { "itinerary": term }}]
                     for term in prompt_split
-                ],
-                [
+                ]
+                )),
+		"must":
+		[
                     { "match": { "location": kw.lower() }}
                     for kw in keywords
-                ]]
-                ))
+                ]
             }
         },
         "size" : size
